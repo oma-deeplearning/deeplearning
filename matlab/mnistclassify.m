@@ -20,11 +20,15 @@
 clear all
 close all
 
-maxepoch=50; 
+maxepoch=5; 
 numhid=500; numpen=500; numpen2=2000; 
+numtargets = 2;
+trainbatchsize = 100;
+testbatchsize = 5;
+numminibatches = 1;
 
 fprintf(1,'Converting Raw files into Matlab format \n');
-converter; 
+% converter; 
 
 fprintf(1,'Pretraining a deep autoencoder. \n');
 fprintf(1,'The Science paper used 50 epochs. This uses %3i \n', maxepoch);

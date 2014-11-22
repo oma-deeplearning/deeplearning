@@ -13,7 +13,7 @@
 % application.  All use of these programs is entirely at the user's own risk.
 
 
-function [f, df] = CG_CLASSIFY(VV,Dim,XX,target);
+function [f, df] = CG_CLASSIFY(VV,Dim,XX,target,numtargets);
 
 l1 = Dim(1);
 l2 = Dim(2);
@@ -38,7 +38,7 @@ N = size(XX,1);
   w3probs = 1./(1 + exp(-w2probs*w3)); w3probs = [w3probs  ones(N,1)];
 
   targetout = exp(w3probs*w_class);
-  targetout = targetout./repmat(sum(targetout,2),1,10);
+  targetout = targetout./repmat(sum(targetout,2),1,numtargets);
   f = -sum(sum( target(:,1:end).*log(targetout))) ;
 
 IO = (targetout-target(:,1:end));

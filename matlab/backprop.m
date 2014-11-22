@@ -116,10 +116,10 @@ for batch = 1:testnumbatches
 %%%%%%%%%%%%%% END OF COMPUTING TEST RECONSTRUCTION ERROR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  tt=0;
- for batch = 1:numbatches/10
+ for batch = 1:numbatches/numtargets
  fprintf(1,'epoch %d batch %d\r',epoch,batch);
 
-%%%%%%%%%%% COMBINE 10 MINIBATCHES INTO 1 LARGER MINIBATCH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% COMBINE MINIBATCHES INTO 1 LARGER MINIBATCH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  tt=tt+1; 
  data=[];
  for kk=1:10

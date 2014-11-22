@@ -34,7 +34,7 @@ N=numcases;
 w1=[vishid; hidrecbiases];
 w2=[hidpen; penrecbiases];
 w3=[hidpen2; penrecbiases2];
-w_class = 0.1*randn(size(w3,2)+1,10);
+w_class = 0.1*randn(size(w3,2)+1,numtargets);
  
 
 %%%%%%%%%% END OF PREINITIALIZATIO OF WEIGHTS  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,7 +43,7 @@ l1=size(w1,1)-1;
 l2=size(w2,1)-1;
 l3=size(w3,1)-1;
 l4=size(w_class,1)-1;
-l5=10; 
+l5=numtargets; 
 test_err=[];
 train_err=[];
 
@@ -64,7 +64,7 @@ N=numcases;
   w2probs = 1./(1 + exp(-w1probs*w2)); w2probs = [w2probs ones(N,1)];
   w3probs = 1./(1 + exp(-w2probs*w3)); w3probs = [w3probs  ones(N,1)];
   targetout = exp(w3probs*w_class);
-  targetout = targetout./repmat(sum(targetout,2),1,10);
+  targetout = targetout./repmat(sum(targetout,2),1,numtargets);
 
   [I J]=max(targetout,[],2);
   [I1 J1]=max(target,[],2);
@@ -90,7 +90,7 @@ for batch = 1:testnumbatches
   w2probs = 1./(1 + exp(-w1probs*w2)); w2probs = [w2probs ones(N,1)];
   w3probs = 1./(1 + exp(-w2probs*w3)); w3probs = [w3probs  ones(N,1)];
   targetout = exp(w3probs*w_class);
-  targetout = targetout./repmat(sum(targetout,2),1,10);
+  targetout = targetout./repmat(sum(targetout,2),1,numtargets);
 
   [I J]=max(targetout,[],2);
   [I1 J1]=max(target,[],2);
@@ -105,18 +105,18 @@ end
 %%%%%%%%%%%%%% END OF COMPUTING TEST MISCLASSIFICATION ERROR %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  tt=0;
- for batch = 1:numbatches/10
+ for batch = 1:numbatches/numminibatches
  fprintf(1,'epoch %d batch %d\r',epoch,batch);
 
-%%%%%%%%%%% COMBINE 10 MINIBATCHES INTO 1 LARGER MINIBATCH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%% COMBINE numminibatches MINIBATCHES INTO 1 LARGER MINIBATCH %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  tt=tt+1; 
  data=[];
  targets=[]; 
- for kk=1:10
+ for kk=1:numminibatches
   data=[data 
-        batchdata(:,:,(tt-1)*10+kk)]; 
+        batchdata(:,:,(tt-1)*numminibatches+kk)]; 
   targets=[targets
-        batchtargets(:,:,(tt-1)*10+kk)];
+        batchtargets(:,:,(tt-1)*numminibatches+kk)];
  end 
 
 %%%%%%%%%%%%%%% PERFORM CONJUGATE GRADIENT WITH 3 LINESEARCHES %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -131,13 +131,13 @@ end
 
     VV = [w_class(:)']';
     Dim = [l4; l5];
-    [X, fX] = minimize(VV,'CG_CLASSIFY_INIT',max_iter,Dim,w3probs,targets);
+    [X, fX] = minimize(VV,'CG_CLASSIFY_INIT',max_iter,Dim,w3probs,targets,numtargets);
     w_class = reshape(X,l4+1,l5);
 
   else
     VV = [w1(:)' w2(:)' w3(:)' w_class(:)']';
     Dim = [l1; l2; l3; l4; l5];
-    [X, fX] = minimize(VV,'CG_CLASSIFY',max_iter,Dim,data,targets);
+    [X, fX] = minimize(VV,'CG_CLASSIFY',max_iter,Dim,data,targets,numtargets);
 
     w1 = reshape(X(1:(l1+1)*l2),l1+1,l2);
     xxx = (l1+1)*l2;
